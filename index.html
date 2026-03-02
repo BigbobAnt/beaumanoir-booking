@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réserver mon entretien — Projet ERP/OMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#1e5c4f;--green-light:#d4e8e3;--green-mid:#2d7a67;
+    --orange:#e07b3a;--orange-light:#f5e4d6;
+    --red:#dc2626;--red-light:#fee2e2;
+    --purple:#7c3aed;--purple-light:#ede9fe;
+    --cream:#faf8f5;--navy:#1a2236;--gray:#6b7280;
+    --white:#fff;--shadow:0 4px 24px rgba(30,92,79,.10);--radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);min-height:100vh;}
+
+  header{background:var(--white);border-bottom:1px solid #e8ede9;padding:16px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(30,92,79,.06);}
+  .logo-badge{width:38px;height:38px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+  .logo-text{font-family:'Playfair Display',serif;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green);line-height:1.2;}
+  .logo-sub{font-size:11px;color:var(--gray);letter-spacing:.04em;}
+  .header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .header-tag{background:var(--green-light);color:var(--green);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;}
+  .admin-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid #e0e7e3;background:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;position:relative;}
+  .admin-btn:hover{border-color:var(--purple);background:var(--purple-light);}
+  .admin-btn.active{background:var(--purple);border-color:var(--purple);}
+  .admin-badge{position:absolute;top:-3px;right:-3px;width:10px;height:10px;background:var(--purple);border-radius:50%;border:2px solid var(--white);display:none;}
+  .admin-btn.active .admin-badge{display:block;}
+
+  .hero{max-width:800px;margin:44px auto 0;padding:0 24px;text-align:center;}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--orange-light);color:var(--orange);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;margin-bottom:16px;letter-spacing:.06em;text-transform:uppercase;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(24px,3.5vw,38px);font-weight:700;color:var(--navy);line-height:1.2;margin-bottom:12px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{font-size:14px;color:var(--gray);line-height:1.7;max-width:500px;margin:0 auto 32px;}
+
+  .info-row{display:flex;justify-content:center;gap:10px;margin-bottom:36px;flex-wrap:wrap;padding:0 24px;}
+  .info-card{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid #e8ede9;border-radius:11px;padding:9px 14px;font-size:12px;font-weight:500;color:var(--navy);box-shadow:var(--shadow);}
+
+  .main{max-width:1100px;margin:0 auto;padding:0 20px 80px;}
+
+  .user-form-card{background:var(--white);border-radius:var(--radius);padding:22px 26px;margin-bottom:24px;box-shadow:var(--shadow);border:1px solid #e8ede9;}
+  .section-title{font-weight:600;font-size:14px;margin-bottom:13px;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .section-title::before{content:'';display:block;width:3px;height:16px;background:var(--green);border-radius:2px;}
+  .form-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .form-group{flex:1;min-width:160px;}
+  label{display:block;font-size:12px;font-weight:500;color:var(--gray);margin-bottom:4px;}
+  input[type="text"],input[type="email"]{width:100%;padding:9px 12px;border:1.5px solid #e0e7e3;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);background:var(--cream);transition:border .2s;outline:none;}
+  input[type="text"]:focus,input[type="email"]:focus{border-color:var(--green);background:var(--white);}
+
+  .week-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:6px;}
+  .nav-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid #e0e7e3;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;color:var(--navy);}
+  .nav-btn:hover:not(:disabled){border-color:var(--green);background:var(--green-light);color:var(--green);}
+  .nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+  .week-label{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--navy);min-width:260px;text-align:center;}
+  .week-sub{font-size:12px;color:var(--gray);text-align:center;margin-bottom:20px;}
+
+  .admin-banner{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:12px;padding:12px 20px;margin-bottom:20px;display:none;align-items:center;gap:12px;flex-wrap:wrap;}
+  .admin-banner.visible{display:flex;}
+  .admin-banner-text{font-size:13px;font-weight:600;color:var(--purple);flex:1;}
+  .admin-banner-sub{font-size:12px;color:var(--purple);opacity:.8;width:100%;margin-top:2px;}
+  .admin-hint{font-size:12px;color:var(--purple);background:rgba(124,58,237,.1);padding:4px 10px;border-radius:8px;font-weight:500;}
+
+  .days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+  @media(max-width:800px){.days-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:520px){.days-grid{grid-template-columns:1fr 1fr;}}
+
+  .day-col{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid #e8ede9;}
+  .day-col.blocked-day{opacity:.7;}
+  .day-header{background:var(--green);color:var(--white);padding:13px 10px;text-align:center;position:relative;}
+  .day-header.blocked-day-header{background:#6b7280;}
+  .day-name{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:1px;}
+  .day-number{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;line-height:1;}
+  .day-month{font-size:10px;opacity:.65;margin-top:2px;}
+  .day-blocked-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.2);border-radius:5px;padding:2px 6px;margin-top:5px;display:none;}
+  .day-col.blocked-day .day-blocked-label{display:inline-block;}
+  .block-day-btn{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:4px;border:none;background:rgba(255,255,255,.25);color:var(--white);font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .15s;}
+  .block-day-btn:hover{background:rgba(255,255,255,.45);}
+  .admin-mode .block-day-btn{display:flex;}
+
+  .day-slots{padding:10px;display:flex;flex-direction:column;gap:7px;}
+  .slot-group-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);padding:1px 0;}
+  .slot-group-divider{border:none;border-top:1px dashed #e8ede9;margin:2px 0;}
+
+  .slot-btn{width:100%;padding:10px 9px;border-radius:9px;border:1.5px solid #e0e7e3;background:var(--cream);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--navy);transition:all .18s;display:flex;align-items:center;gap:6px;}
+  .slot-btn:hover:not(.taken):not(.selected):not(.admin-blocked):not(.day-off){border-color:var(--green);background:var(--green-light);color:var(--green);}
+  .slot-btn.taken{background:#f3f4f6;border-color:#e5e7eb;color:#9ca3af;cursor:not-allowed;}
+  .slot-btn.admin-blocked{background:var(--red-light);border-color:#fca5a5;color:#9ca3af;cursor:not-allowed;}
+  .slot-btn.day-off{background:#f3f4f6;border-color:#e5e7eb;color:#c4c9d4;cursor:not-allowed;}
+  .slot-btn.selected{background:var(--green);border-color:var(--green);color:var(--white);box-shadow:0 3px 12px rgba(30,92,79,.25);}
+  .admin-mode .slot-btn:not(.taken):not(.selected):not(.day-off):hover{border-color:var(--red);background:var(--red-light);color:var(--red);}
+  .admin-mode .slot-btn.admin-blocked:hover{border-color:var(--green);background:var(--green-light);color:var(--green);cursor:pointer;}
+
+  .slot-info{flex:1;text-align:left;}
+  .slot-time{font-size:12px;font-weight:600;line-height:1.2;}
+  .slot-sub{font-size:10px;opacity:.65;margin-top:1px;}
+  .slot-badge{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+  .slot-btn.taken .slot-badge{background:#fef2f2;color:#ef4444;}
+  .slot-btn.admin-blocked .slot-badge{background:#fee2e2;color:#dc2626;}
+  .slot-btn:not(.taken):not(.selected):not(.admin-blocked):not(.day-off) .slot-badge{background:var(--green-light);color:var(--green);}
+  .slot-btn.selected .slot-badge{background:rgba(255,255,255,.2);color:#fff;}
+  .slot-btn.day-off .slot-badge{background:#f3f4f6;color:#9ca3af;}
+
+  .confirm-section{background:var(--white);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow);border:1px solid #e8ede9;display:none;}
+  .confirm-section.visible{display:block;}
+  .confirm-summary{background:var(--green-light);border-radius:10px;padding:14px 18px;margin-bottom:16px;border-left:4px solid var(--green);}
+  .confirm-summary strong{color:var(--green);font-size:14px;display:block;margin-bottom:3px;}
+  .confirm-summary span{color:var(--green);font-size:13px;opacity:.85;}
+  .confirm-btn{background:var(--green);color:var(--white);border:none;padding:13px 26px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:background .2s,transform .1s;}
+  .confirm-btn:hover{background:var(--green-mid);transform:translateY(-1px);}
+  .confirm-note{font-size:11px;color:var(--gray);text-align:center;margin-top:10px;line-height:1.6;}
+
+  .success-card{display:none;background:var(--white);border-radius:var(--radius);padding:44px 28px;text-align:center;box-shadow:var(--shadow);border:2px solid var(--green);}
+  .success-card.visible{display:block;}
+  .success-icon{font-size:48px;margin-bottom:14px;}
+  .success-card h2{font-family:'Playfair Display',serif;font-size:24px;color:var(--green);margin-bottom:8px;}
+  .success-card p{color:var(--gray);font-size:14px;line-height:1.7;max-width:440px;margin:0 auto;}
+  .success-detail{background:var(--green-light);border-radius:10px;padding:12px 20px;margin:14px auto;max-width:400px;color:var(--green);font-weight:600;font-size:14px;}
+  .success-name{font-size:12px;color:var(--green);opacity:.7;margin-top:4px;margin-bottom:20px;}
+
+  .action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:20px 0 10px;}
+  .btn-ics{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;background:var(--green);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s,transform .1s;}
+  .btn-ics:hover{background:var(--green-mid);transform:translateY(-1px);}
+  .btn-notify{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;background:var(--white);color:var(--navy);border:1.5px solid #e0e7e3;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;}
+  .btn-notify:hover{border-color:var(--green);background:var(--green-light);color:var(--green);}
+  .action-hint{font-size:11px;color:var(--gray);text-align:center;margin-top:6px;line-height:1.6;}
+
+  .book-another{display:inline-block;margin-top:14px;padding:10px 22px;border-radius:9px;border:1.5px solid #e0e7e3;background:transparent;color:var(--gray);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
+  .book-another:hover{border-color:var(--navy);color:var(--navy);}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,34,54,.45);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+  .modal-overlay.visible{display:flex;}
+  .modal{background:var(--white);border-radius:16px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .modal h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);margin-bottom:6px;}
+  .modal p{font-size:13px;color:var(--gray);margin-bottom:20px;line-height:1.6;}
+  .modal input[type="password"]{width:100%;padding:11px 14px;border:1.5px solid #e0e7e3;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:15px;letter-spacing:.2em;color:var(--navy);background:var(--cream);outline:none;transition:border .2s;margin-bottom:8px;}
+  .modal input[type="password"]:focus{border-color:var(--purple);}
+  .modal-error{font-size:12px;color:var(--red);margin-bottom:12px;min-height:16px;}
+  .modal-actions{display:flex;gap:10px;}
+  .modal-cancel{flex:1;padding:11px;border-radius:9px;border:1.5px solid #e0e7e3;background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--gray);}
+  .modal-confirm{flex:2;padding:11px;border-radius:9px;border:none;background:var(--purple);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  .modal-confirm:hover{background:#6d28d9;}
+
+  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(250,248,245,.85);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .loading-overlay.visible{display:flex;}
+  .spinner{width:38px;height:38px;border:3px solid var(--green-light);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .footer{text-align:center;padding:24px;font-size:11px;color:var(--gray);border-top:1px solid #e8ede9;margin-top:40px;}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <h3>🔐 Accès administrateur</h3>
+    <p>Saisissez le code admin pour activer le mode de gestion des créneaux.</p>
+    <input type="password" id="adminCodeInput" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter')checkAdminCode()">
+    <div class="modal-error" id="adminError"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeAdminModal()">Annuler</button>
+      <button class="modal-confirm" onclick="checkAdminCode()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo-badge">🚀</div>
+    <div>
+      <div class="logo-text">Groupe Beaumanoir</div>
+      <div class="logo-sub">Projet ERP / OMS — Phase de cadrage</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-tag" id="headerTag">Chargement…</div>
+    <button class="admin-btn" id="adminToggleBtn" onclick="toggleAdmin()" title="Mode administrateur">
+      ⚙️<span class="admin-badge"></span>
+    </button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">📅 Entretien individuel 1-to-1</div>
+  <h1>Réservez votre<br><span>créneau d'entretien</span></h1>
+  <p>Choisissez le moment qui vous convient. Aucune préparation n'est nécessaire — nous venons simplement vous écouter parler de votre quotidien.</p>
+</div>
+
+<div class="info-row">
+  <div class="info-card">⏱️ Durée : 1h30</div>
+  <div class="info-card">💻 Visio Teams</div>
+  <div class="info-card">✅ Aucune préparation</div>
+  <div class="info-card">🗓️ Mars → Août 2026</div>
+</div>
+
+<div class="main">
+
+  <div class="user-form-card" id="userFormCard">
+    <div class="section-title">Vos informations</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">Prénom *</label>
+        <input type="text" id="firstName" placeholder="ex. Marie">
+      </div>
+      <div class="form-group">
+        <label for="lastName">Nom *</label>
+        <input type="text" id="lastName" placeholder="ex. Dupont">
+      </div>
+      <div class="form-group">
+        <label for="userEmail">Email professionnel *</label>
+        <input type="email" id="userEmail" placeholder="m.dupont@beaumanoir.fr">
+      </div>
+      <div class="form-group">
+        <label for="brand">Marque / Entité</label>
+        <input type="text" id="brand" placeholder="ex. Cache Cache…">
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-banner" id="adminBanner">
+    <div>
+      <div class="admin-banner-text">🛡️ Mode administrateur actif</div>
+      <div class="admin-banner-sub">Cliquez sur un créneau libre pour le bloquer · Cliquez sur un créneau bloqué pour le libérer · Utilisez 🚫 pour bloquer une journée entière</div>
+    </div>
+    <span class="admin-hint">Admin</span>
+  </div>
+
+  <div class="week-nav">
+    <button class="nav-btn" id="prevWeekBtn" onclick="changeWeek(-1)">‹</button>
+    <div class="week-label" id="weekLabel">—</div>
+    <button class="nav-btn" id="nextWeekBtn" onclick="changeWeek(1)">›</button>
+  </div>
+  <div class="week-sub">4 créneaux par jour · Lundi au Vendredi</div>
+
+  <div class="days-grid" id="daysGrid"></div>
+
+  <div class="confirm-section" id="confirmSection">
+    <div class="section-title">Confirmer ma réservation</div>
+    <div class="confirm-summary" id="confirmSummary"></div>
+    <button class="confirm-btn" onclick="confirmBooking()">✓ Confirmer ma réservation</button>
+    <p class="confirm-note">Après confirmation, téléchargez votre invitation .ics pour l'ajouter directement à Outlook.</p>
+  </div>
+
+  <div class="success-card" id="successCard">
+    <div class="success-icon">🎉</div>
+    <h2>Réservation confirmée !</h2>
+    <div class="success-detail" id="successDetail"></div>
+    <div class="success-name" id="successName"></div>
+    <div class="action-row">
+      <a id="btnIcs" class="btn-ics" download="entretien-erp-oms.ics">📅 Ajouter à mon agenda Outlook</a>
+      <a id="btnNotify" class="btn-notify" target="_blank">✉️ Notifier l'équipe projet</a>
+    </div>
+    <div class="action-hint">
+      Le fichier .ics s'ouvre dans Outlook et ajoute l'événement à votre calendrier.<br>
+      L'équipe projet vous enverra ensuite le lien Teams définitif.
+    </div>
+    <br>
+    <button class="book-another" onclick="resetSuccess()">← Retour au calendrier</button>
+  </div>
+
+</div>
+
+<div class="footer">
+  Projet ERP / OMS — Groupe Beaumanoir &nbsp;·&nbsp; Grégoire HEBERT — Direction Métier
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────
+const ADMIN_CODE  = '2026';                          // ← à changer
+const ADMIN_EMAIL = 'g.hebert@beaumanoir.fr';        // ← à ajuster
+const TEAMS_LINK  = '[LIEN TEAMS À COMPLÉTER]';      // ← à remplacer
+const API_URL     = '/api/slots';                    // Vercel serverless function
+
+const SLOTS = [
+  { id:'M1', time:'9h00 – 10h30',  label:'Matin',      group:'matin', startH:9,  startM:0,  endH:10, endM:30 },
+  { id:'M2', time:'11h00 – 12h30', label:'Matin',      group:'matin', startH:11, startM:0,  endH:12, endM:30 },
+  { id:'A1', time:'14h00 – 15h30', label:'Après-midi', group:'aprem', startH:14, startM:0,  endH:15, endM:30 },
+  { id:'A2', time:'16h00 – 17h30', label:'Après-midi', group:'aprem', startH:16, startM:0,  endH:17, endM:30 },
+];
+
+const MIN_DATE = new Date(2026, 2, 23);
+const MAX_DATE = new Date(2026, 7, 31);
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentWeekMonday = null;
+let adminMode  = false;
+let data       = { taken:{}, adminBlocked:{}, blockedDays:{} };
+let selectedSlot = null;
+let lastBooking  = null;
+
+// ─────────────────────────────────────────────
+//  API (Vercel KV via /api/slots)
+// ─────────────────────────────────────────────
+async function loadData() {
+  showLoading(true);
+  try {
+    const r = await fetch(API_URL);
+    if (r.ok) data = await r.json();
+  } catch(e) { console.warn('API unavailable, using empty state'); }
+  if (!data.taken)        data.taken = {};
+  if (!data.adminBlocked) data.adminBlocked = {};
+  if (!data.blockedDays)  data.blockedDays = {};
+  showLoading(false);
+}
+
+async function saveData() {
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch(e) { console.error('Save failed', e); }
+}
+
+function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('visible', v); }
+
+// ─────────────────────────────────────────────
+//  DATE UTILS
+// ─────────────────────────────────────────────
+function getMonday(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const day = d.getDay();
+  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+  return d;
+}
+function dateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function slotKey(ds, sid) { return `${ds}_${sid}`; }
+
+const DAY_NAMES   = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
+const DAY_FULL    = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTH_NAMES = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const MONTH_SHORT = ['Jan.','Fév.','Mars','Avr.','Mai','Juin','Juil.','Août','Sep.','Oct.','Nov.','Déc.'];
+
+function formatDayFull(date) {
+  return `${DAY_FULL[date.getDay()]} ${date.getDate()} ${MONTH_NAMES[date.getMonth()]}`;
+}
+
+// ─────────────────────────────────────────────
+//  WEEK NAV
+// ─────────────────────────────────────────────
+function initWeek() {
+  const todayMon = getMonday(new Date());
+  const minMon   = getMonday(MIN_DATE);
+  currentWeekMonday = todayMon < minMon ? new Date(minMon) : new Date(todayMon);
+  updateNav(); renderCalendar();
+}
+
+function changeWeek(dir) {
+  const next = new Date(currentWeekMonday);
+  next.setDate(next.getDate() + dir * 7);
+  const nm = getMonday(next);
+  if (nm < getMonday(MIN_DATE) || nm > getMonday(MAX_DATE)) return;
+  currentWeekMonday = nm;
+  selectedSlot = null;
+  document.getElementById('confirmSection').classList.remove('visible');
+  updateNav(); renderCalendar();
+}
+
+function updateNav() {
+  const mon = currentWeekMonday;
+  const fri = new Date(mon); fri.setDate(fri.getDate() + 4);
+  const sameMonth = mon.getMonth() === fri.getMonth();
+  document.getElementById('weekLabel').textContent = sameMonth
+    ? `${mon.getDate()} – ${fri.getDate()} ${MONTH_NAMES[fri.getMonth()]} ${fri.getFullYear()}`
+    : `${mon.getDate()} ${MONTH_SHORT[mon.getMonth()]} – ${fri.getDate()} ${MONTH_SHORT[fri.getMonth()]} ${fri.getFullYear()}`;
+  document.getElementById('headerTag').textContent = `Semaine du ${mon.getDate()} ${MONTH_SHORT[mon.getMonth()]}`;
+  const prevMon = new Date(mon); prevMon.setDate(prevMon.getDate()-7);
+  const nextMon = new Date(mon); nextMon.setDate(nextMon.getDate()+7);
+  document.getElementById('prevWeekBtn').disabled = getMonday(prevMon) < getMonday(MIN_DATE);
+  document.getElementById('nextWeekBtn').disabled = getMonday(nextMon) > getMonday(MAX_DATE);
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function renderCalendar() {
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  if (adminMode) grid.classList.add('admin-mode');
+  else grid.classList.remove('admin-mode');
+
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(currentWeekMonday);
+    date.setDate(date.getDate() + i);
+    const ds = dateStr(date);
+    const dayBlocked = !!data.blockedDays[ds];
+
+    const col = document.createElement('div');
+    col.className = 'day-col' + (dayBlocked ? ' blocked-day' : '');
+
+    let slotsHTML = ''; let lastGroup = null;
+    SLOTS.forEach((slot) => {
+      const key = slotKey(ds, slot.id);
+      const isTaken   = !!data.taken[key];
+      const isBlocked = !!data.adminBlocked[key];
+      const isDayOff  = dayBlocked;
+      if (slot.group !== lastGroup) {
+        if (lastGroup !== null) slotsHTML += '<div class="slot-group-divider"></div>';
+        slotsHTML += `<div class="slot-group-label">${slot.group==='matin'?'🌅 Matin':'☀️ Après-midi'}</div>`;
+        lastGroup = slot.group;
+      }
+      let cls = 'slot-btn';
+      let badge = 'Libre';
+      if (isDayOff)    { cls+=' day-off';       badge='Indispo'; }
+      else if(isTaken) { cls+=' taken';          badge='Réservé'; }
+      else if(isBlocked){ cls+=' admin-blocked'; badge='Bloqué'; }
+      const onclick = `handleSlotClick('${ds}','${slot.id}','${slot.time}','${slot.label}','${formatDayFull(date)}')`;
+      slotsHTML += `
+        <button class="${cls}" onclick="${onclick}" ${(isTaken||isDayOff)?'disabled':''}>
+          <div class="slot-info"><div class="slot-time">${slot.time}</div><div class="slot-sub">1h30</div></div>
+          <span class="slot-badge">${badge}</span>
+        </button>`;
+    });
+
+    const blockIcon  = dayBlocked ? '🔓' : '🚫';
+    col.innerHTML = `
+      <div class="day-header${dayBlocked?' blocked-day-header':''}">
+        <div class="day-name">${DAY_NAMES[date.getDay()]}</div>
+        <div class="day-number">${date.getDate()}</div>
+        <div class="day-month">${MONTH_SHORT[date.getMonth()]}</div>
+        <div class="day-blocked-label">Indisponible</div>
+        <button class="block-day-btn" onclick="toggleBlockDay('${ds}')" title="Bloquer/débloquer la journée">${blockIcon}</button>
+      </div>
+      <div class="day-slots">${slotsHTML}</div>`;
+    grid.appendChild(col);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  BOOKING FLOW
+// ─────────────────────────────────────────────
+function handleSlotClick(ds, slotId, time, label, dayFull) {
+  if (adminMode) { handleAdminSlotClick(ds, slotId); return; }
+  const fn = document.getElementById('firstName').value.trim();
+  const ln = document.getElementById('lastName').value.trim();
+  const em = document.getElementById('userEmail').value.trim();
+  if (!fn || !ln) { alert('Merci de renseigner votre prénom et votre nom.'); document.getElementById('firstName').focus(); return; }
+  if (!em || !em.includes('@')) { alert('Merci de renseigner votre adresse email professionnelle.'); document.getElementById('userEmail').focus(); return; }
+  selectedSlot = { dateStr:ds, slotId, time, label, dayFull };
+  renderCalendar();
+  document.getElementById('confirmSummary').innerHTML = `
+    <strong>📅 ${fn} ${ln} — ${dayFull}</strong>
+    <span>${label} · ${time}</span>`;
+  const section = document.getElementById('confirmSection');
+  section.classList.add('visible');
+  section.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+async function confirmBooking() {
+  if (!selectedSlot) return;
+  const fn    = document.getElementById('firstName').value.trim();
+  const ln    = document.getElementById('lastName').value.trim();
+  const em    = document.getElementById('userEmail').value.trim();
+  const brand = document.getElementById('brand').value.trim();
+  const key   = slotKey(selectedSlot.dateStr, selectedSlot.slotId);
+
+  data.taken[key] = { firstName:fn, lastName:ln, email:em, brand };
+  showLoading(true);
+  await saveData();
+  showLoading(false);
+
+  lastBooking = { fn, ln, em, brand, ...selectedSlot };
+  document.getElementById('confirmSection').classList.remove('visible');
+  document.getElementById('userFormCard').style.display = 'none';
+  document.getElementById('btnIcs').href    = buildIcsDataUrl(lastBooking);
+  document.getElementById('btnNotify').href = buildMailto(lastBooking);
+  document.getElementById('successDetail').textContent = `${selectedSlot.dayFull} · ${selectedSlot.label} · ${selectedSlot.time}`;
+  document.getElementById('successName').textContent   = `${fn} ${ln}${brand?' — '+brand:''}`;
+  const sc = document.getElementById('successCard');
+  sc.classList.add('visible');
+  sc.scrollIntoView({ behavior:'smooth', block:'start' });
+  renderCalendar();
+  selectedSlot = null;
+}
+
+function resetSuccess() {
+  document.getElementById('successCard').classList.remove('visible');
+  document.getElementById('userFormCard').style.display = '';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ─────────────────────────────────────────────
+//  ICS GENERATOR
+// ─────────────────────────────────────────────
+function buildIcsDataUrl(b) {
+  const slot  = SLOTS.find(s => s.id === b.slotId);
+  const parts = b.dateStr.split('-');
+  const [year, month, day] = parts;
+  function icsDate(y,mo,d,h,mi) {
+    return `${y}${mo}${d}T${String(h).padStart(2,'0')}${String(mi).padStart(2,'0')}00`;
+  }
+  const dtStart = icsDate(year, month, day, slot.startH, slot.startM);
+  const dtEnd   = icsDate(year, month, day, slot.endH,   slot.endM);
+  const now = new Date();
+  const dtstamp = icsDate(
+    now.getFullYear(), String(now.getMonth()+1).padStart(2,'0'), String(now.getDate()).padStart(2,'0'),
+    now.getHours(), now.getMinutes()
+  );
+  const uid = `erp-oms-${b.dateStr}-${b.slotId}-${Date.now()}@beaumanoir.fr`;
+  const description = [
+    `Entretien individuel — Projet ERP / OMS`,``,
+    `Bonjour ${b.fn}\\,`,``,
+    `Votre entretien dans le cadre du projet de transformation ERP/OMS du Groupe Beaumanoir est confirmé.`,``,
+    `Ce dont nous allons parler :`,
+    `Nous souhaitons comprendre comment vous travaillez au quotidien — vos missions\\, vos outils\\, vos habitudes. Pas de bonne ou mauvaise réponse\\, aucune préparation attendue.`,``,
+    `Lien Teams : ${TEAMS_LINK}`,``,
+    `À très vite !`,
+    `Grégoire HEBERT — Direction Métier\\, Projet ERP/OMS — Groupe Beaumanoir`,
+  ].join('\\n');
+
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0',
+    'PRODID:-//Groupe Beaumanoir//ERP-OMS//FR',
+    'CALSCALE:GREGORIAN','METHOD:REQUEST',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,`DTSTAMP:${dtstamp}`,
+    `DTSTART:${dtStart}`,`DTEND:${dtEnd}`,
+    `SUMMARY:Entretien ERP/OMS — ${b.fn} ${b.ln}`,
+    `DESCRIPTION:${description}`,
+    `LOCATION:Microsoft Teams — ${TEAMS_LINK}`,
+    `ORGANIZER;CN=Grégoire HEBERT:mailto:${ADMIN_EMAIL}`,
+    `ATTENDEE;CN=${b.fn} ${b.ln};ROLE=REQ-PARTICIPANT:mailto:${b.em}`,
+    'STATUS:CONFIRMED',
+    'BEGIN:VALARM','TRIGGER:-PT30M','ACTION:DISPLAY',
+    'DESCRIPTION:Rappel : votre entretien ERP/OMS dans 30 minutes',
+    'END:VALARM','END:VEVENT','END:VCALENDAR',
+  ].join('\r\n');
+
+  return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+}
+
+// ─────────────────────────────────────────────
+//  MAILTO
+// ─────────────────────────────────────────────
+function buildMailto(b) {
+  const subject = encodeURIComponent(`[ERP/OMS] Nouvelle réservation — ${b.fn} ${b.ln} — ${b.dayFull}`);
+  const body = encodeURIComponent([
+    `Nouvelle réservation d'entretien ERP/OMS`,``,
+    `Participant : ${b.fn} ${b.ln}`,
+    `Email       : ${b.em}`,
+    `Entité      : ${b.brand||'Non renseigné'}`,
+    `Créneau     : ${b.dayFull} · ${b.label} · ${b.time}`,``,
+    `→ Pensez à envoyer le lien Teams définitif à ${b.em}`,
+  ].join('\n'));
+  return `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+// ─────────────────────────────────────────────
+//  ADMIN
+// ─────────────────────────────────────────────
+function toggleAdmin() {
+  if (!adminMode) {
+    document.getElementById('adminCodeInput').value = '';
+    document.getElementById('adminError').textContent = '';
+    document.getElementById('adminModal').classList.add('visible');
+    setTimeout(()=>document.getElementById('adminCodeInput').focus(),100);
+  } else {
+    adminMode = false;
+    document.getElementById('adminToggleBtn').classList.remove('active');
+    document.getElementById('adminBanner').classList.remove('visible');
+    renderCalendar();
+  }
+}
+
+function checkAdminCode() {
+  if (document.getElementById('adminCodeInput').value === ADMIN_CODE) {
+    adminMode = true;
+    document.getElementById('adminModal').classList.remove('visible');
+    document.getElementById('adminToggleBtn').classList.add('active');
+    document.getElementById('adminBanner').classList.add('visible');
+    renderCalendar();
+  } else {
+    document.getElementById('adminError').textContent = 'Code incorrect. Réessayez.';
+    document.getElementById('adminCodeInput').select();
+  }
+}
+
+function closeAdminModal() { document.getElementById('adminModal').classList.remove('visible'); }
+
+async function handleAdminSlotClick(ds, slotId) {
+  const key = slotKey(ds, slotId);
+  if (data.adminBlocked[key]) delete data.adminBlocked[key];
+  else if (!data.taken[key])  data.adminBlocked[key] = true;
+  showLoading(true); await saveData(); showLoading(false);
+  renderCalendar();
+}
+
+async function toggleBlockDay(ds) {
+  if (data.blockedDays[ds]) delete data.blockedDays[ds];
+  else data.blockedDays[ds] = true;
+  showLoading(true); await saveData(); showLoading(false);
+  renderCalendar();
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+loadData().then(initWeek);
+</script>
+</body>
+</html>
