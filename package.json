@@ -1,7 +1,7 @@
 {
   "name": "beaumanoir-erp-oms-booking",
   "version": "1.0.0",
-  "description": "Application de réservation d'entretiens — Projet ERP/OMS Groupe Beaumanoir",
+  "type": "module",
   "dependencies": {
     "@upstash/redis": "^1.34.0"
   }
